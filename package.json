@@ -1,13 +1,13 @@
 {
   "name": "Kobo-eReader-Exporter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "",
   "description": "A GUI application that makes you export data from the Kobo eReader database.",
   "license": "MIT",
   "main": "./dist/electron/main.js",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/benxuhuang/electron-vue-kobo-eReader-exporter.git"
   },
   "keywords": [
     "electron",
@@ -30,7 +30,8 @@
     "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
     "postinstall": "install-app-deps",
-    "packageVersion": "echo $npm_package_version"
+    "packageVersion": "echo $npm_package_version",
+    "deploy:github": "node .electron-vue/build.js && electron-builder --mac --win --publish always"
   },
   "build": {
     "productName": "Kobo-eReader-Exporter",
@@ -108,7 +109,7 @@
     "del": "^3.0.0",
     "devtron": "^1.4.0",
     "electron": "^2.0.4",
-    "electron-builder": "^20.20.4",
+    "electron-builder": "^22.14.5",
     "electron-debug": "^1.4.0",
     "electron-devtools-installer": "^2.2.0",
     "electron-rebuild": "^3.2.6",

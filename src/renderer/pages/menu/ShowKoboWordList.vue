@@ -48,7 +48,20 @@ export default {
           minWidth: 200,
           render: (h, params) => {
             return h("div", [
-              h("strong", params.row.Text.toLowerCase()),
+              h(
+                "a",
+                {
+                  style: {
+                    "font-size": "25px",
+                  },
+                  on: {
+                    click: () => {
+                      this.openUrl(params.row.Text);
+                    },
+                  },
+                },
+                params.row.Text.toLowerCase()
+              ),
               h("i", {
                 class: {
                   "ivu-icon": true,
@@ -140,6 +153,10 @@ export default {
       const url = `https://s.yimg.com/bg/dict/dreye/live/m/${text.toLowerCase()}.mp3`;
       let player = new Player({});
       player.src(url).play();
+    },
+    openUrl(word) {
+      const url = `https://dictionary.cambridge.org/zht/%E8%A9%9E%E5%85%B8/%E8%8B%B1%E8%AA%9E-%E6%BC%A2%E8%AA%9E-%E7%B9%81%E9%AB%94/${word}`;
+      this.$electron.shell.openExternal(url);
     },
   },
   created() {

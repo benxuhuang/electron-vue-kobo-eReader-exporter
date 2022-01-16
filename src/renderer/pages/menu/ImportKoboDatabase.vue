@@ -47,18 +47,28 @@ export default {
           }
 
           let attachDbSql = `ATTACH DATABASE '${filepath[0]}' AS attachdb;`;
+
           this.$db.all(attachDbSql, (err, res) => {
             console.log(`attachDbSql:${err}`);
 
-            let deleteOldDataeSql = `DELETE FROM main.WordList;`;
+            let deleteOldDataeSql = `DELETE FROM main.WordList; DELETE FROM main.Bookmark;`;
+
             this.$db.run(deleteOldDataeSql, (err, res) => {
               console.log(`deleteOldDataeSql:${err}`);
 
-              let getNewDataSql = `SELECT * FROM attachdb.WordList;`;
-              this.$db.all(getNewDataSql, (err, res) => {
-                console.log(`getNewDataSql:${err}`);
+              //Import Bookmark table
+              let insertIntoBookmark = `INSERT INTO main.Bookmark SELECT * FROM attachdb.Bookmark;`;
+              this.$db.all(insertIntoBookmark, (err, res) => {
+                console.log(`insertIntoBookmark:${err}`);
+              });
 
-                if (res.length == 0) {
+              //Import WordList table
+              let getNewWordListDataSql = `SELECT * FROM attachdb.WordList;`;
+
+              this.$db.all(getNewWordListDataSql, (err, wordListRes) => {
+                console.log(`getNewWordListDataSql:${err}`);
+
+                if (wordListRes.length == 0) {
                   this.dataLoading = false;
                   this.$Notice.success({
                     title: "Success",
@@ -66,36 +76,35 @@ export default {
                   });
                 }
 
-                let newDataList = res;
-                console.log(newDataList);
+                console.log(wordListRes);
 
-                for (let i = 0; i < newDataList.length; i++) {
-                  search(newDataList[i].Text).then((result) => {
+                for (let i = 0; i < wordListRes.length; i++) {
+                  search(wordListRes[i].Text).then((result) => {
                     if (result[0] != undefined) {
-                      newDataList[i].Definition = opencc.simplifiedToTaiwan(
+                      wordListRes[i].Definition = opencc.simplifiedToTaiwan(
                         result[0].translation.join().replace(/,/g, " ")
                       );
                       console.log(
                         result[0].translation.join().replace(/,/g, " ")
                       );
                     } else {
-                      newDataList[i].Definition = "";
+                      wordListRes[i].Definition = "";
                     }
 
                     this.$db.run(
                       "INSERT INTO main.WordList (Text, DateCreated, Definition, VolumeId) VALUES (?, ?, ?, ?)",
                       [
-                        newDataList[i].Text,
-                        newDataList[i].DateCreated,
-                        newDataList[i].Definition,
-                        newDataList[i].VolumeId,
+                        wordListRes[i].Text,
+                        wordListRes[i].DateCreated,
+                        wordListRes[i].Definition,
+                        wordListRes[i].VolumeId,
                       ]
                     ),
                       (err) => {
                         console.log(`INSERT INTO:${err}`);
                       };
 
-                    if (i == newDataList.length - 1) {
+                    if (i == wordListRes.length - 1) {
                       this.dataLoading = false;
                       this.$Notice.success({
                         title: "Success",
@@ -115,6 +124,7 @@ export default {
         }
       );
     },
+    wordImport() {},
     searchWord(word) {
       search(word).then((result) => {
         if (result[0] != undefined) {

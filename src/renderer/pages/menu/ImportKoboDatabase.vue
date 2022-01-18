@@ -56,13 +56,25 @@ export default {
             this.$db.run(deleteOldDataeSql, (err, res) => {
               console.log(`deleteOldDataeSql:${err}`);
 
-              //Import Bookmark table
+              //Copy Bookmark table
               let insertIntoBookmark = `INSERT INTO main.Bookmark SELECT * FROM attachdb.Bookmark;`;
               this.$db.all(insertIntoBookmark, (err, res) => {
                 console.log(`insertIntoBookmark:${err}`);
               });
 
-              //Import WordList table
+              //Copy ShelfContent table
+              let insertIntoShelfContent = `INSERT INTO main.ShelfContent SELECT * FROM attachdb.ShelfContent;`;
+              this.$db.all(insertIntoShelfContent, (err, res) => {
+                console.log(`insertIntoShelfContent:${err}`);
+              });
+
+              //Copy content table
+              let insertIntoContent = `INSERT INTO main.content SELECT * FROM attachdb.content;`;
+              this.$db.all(insertIntoContent, (err, res) => {
+                console.log(`insertIntoContent:${err}`);
+              });
+
+              //Copy WordList table
               let getNewWordListDataSql = `SELECT * FROM attachdb.WordList;`;
 
               this.$db.all(getNewWordListDataSql, (err, wordListRes) => {

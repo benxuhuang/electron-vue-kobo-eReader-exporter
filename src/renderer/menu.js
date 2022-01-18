@@ -1,4 +1,5 @@
 import ShowKoboWordList from "./pages/menu/ShowKoboWordList.vue";
+import ShowKoboBookmark from "./pages/menu/ShowKoboBookmark.vue";
 import ImportKoboDatabase from "./pages/menu/ImportKoboDatabase.vue";
 
 const menu = [
@@ -13,6 +14,12 @@ const menu = [
     title: "Show Kobo Word List",
     path: "/ShowKoboWordList",
     component: ShowKoboWordList,
+  },
+  {
+    icon: "document",
+    title: "Show Kobo Bookmark",
+    path: "/ShowKoboBookmark",
+    component: ShowKoboBookmark,
   },
 ];
 export default menu;

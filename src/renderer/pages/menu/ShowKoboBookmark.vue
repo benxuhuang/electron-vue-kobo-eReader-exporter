@@ -1,6 +1,7 @@
 <template>
   <div>
     <Table
+      height="1000"
       border
       stripe
       size="large"
@@ -28,13 +29,10 @@
         </Button>
       </FormItem>
     </Form>
-    <Alert show-icon style="font-size: 15px;">The pronunciation feature requires network support.</Alert>
   </div>
 </template>
 
 <script>
-import Player from "audio-player-es6";
-
 export default {
   data() {
     return {
@@ -42,54 +40,43 @@ export default {
       dataList: [],
       dataList_table_column: [
         {
-          title: "Word",
-          key: "Text",
-          align: "center",
-          minWidth: 200,
+          title: "BookTitle",
+          key: "BookTitle",
+          align: "left",
+          sortable: true,
           render: (h, params) => {
-            return h("div", [
-              h(
-                "a",
-                {
-                  style: {
-                    "font-size": "25px",
-                  },
-                  on: {
-                    click: () => {
-                      this.openUrl(params.row.Text);
-                    },
-                  },
-                },
-                params.row.Text.toLowerCase()
-              ),
-              h("i", {
-                class: {
-                  "ivu-icon": true,
-                  "ivu-icon-volume-medium": true,
-                },
+            return h(
+              "p",
+              {
                 style: {
-                  "margin-left": "5px",
+                  margin: "15px",
                 },
-                on: {
-                  click: () => {
-                    this.playSound(params.row.Text);
-                  },
-                },
-              }),
-            ]);
+              },
+              params.row.BookTitle
+            );
           },
         },
         {
-          title: "Definition",
-          key: "Definition",
-          align: "center",
-          minWidth: 200,
+          title: "Text",
+          key: "Text",
+          align: "left",
+          minWidth: 400,
+          render: (h, params) => {
+            return h(
+              "p",
+              {
+                style: {
+                  margin: "15px",
+                },
+              },
+              params.row.Text
+            );
+          },
         },
         {
           title: "DateCreated",
           key: "DateCreated",
           align: "center",
-          minWidth: 150,
           sortable: true,
         },
       ],
@@ -115,20 +102,29 @@ export default {
       if (typeof method === "number") {
         this.searchParams.pageIndex = method;
       }
+
       const searchParams = this.searchParams;
+
       const pageSQL = `LIMIT ${
         searchParams.pageSize
       } OFFSET ${(searchParams.pageIndex - 1) * searchParams.pageSize} `;
+
       const orderSQL = `ORDER BY DateCreated ${searchParams.sort} `;
-      const rowSQL =
-        "SELECT Text, Definition, date(DateCreated) as DateCreated from WordList " +
-        orderSQL +
-        pageSQL;
+
+      const sql = `
+          SELECT distinct c.BookTitle, a.Text, date(a.DateCreated) as DateCreated
+          from Bookmark a
+          left outer join ShelfContent b on b.ContentID = a.VolumeID
+          left outer join content c on c.BookID = a.VolumeID
+      `;
+
+      const rowSQL = sql + orderSQL + pageSQL;
       this.$logger(rowSQL);
 
       this.$db.all(rowSQL, (err, res) => {
+        console.log(res);
         this.dataList = res;
-        const countSQL = "SELECT COUNT(VolumeId) AS totalCount from WordList";
+        const countSQL = "SELECT COUNT(VolumeId) AS totalCount from Bookmark";
         this.$logger(countSQL);
         this.$db.get(countSQL, (err, res) => {
           if (err) {
@@ -149,17 +145,8 @@ export default {
     },
     exportCsv() {
       this.$refs.table.exportCsv({
-        filename: "export_data",
+        filename: "export_bookmark_data",
       });
-    },
-    playSound(text) {
-      const url = `https://s.yimg.com/bg/dict/dreye/live/m/${text.toLowerCase()}.mp3`;
-      let player = new Player({});
-      player.src(url).play();
-    },
-    openUrl(word) {
-      const url = `https://dictionary.cambridge.org/zht/%E8%A9%9E%E5%85%B8/%E8%8B%B1%E8%AA%9E-%E6%BC%A2%E8%AA%9E-%E7%B9%81%E9%AB%94/${word}`;
-      this.$electron.shell.openExternal(url);
     },
   },
   created() {

@@ -1,11 +1,11 @@
 <template>
-    <div class="home-background theme-color1">
-        <!-- <Header class="header"></Header> -->
-        <Aside class="aside"></Aside>
-        <div class="container">
-            <router-view class="clearfix"></router-view>
-        </div>
+  <div class="home-background theme-color1">
+    <Header class="header"></Header>
+    <Aside class="aside"></Aside>
+    <div class="container">
+      <router-view class="clearfix"></router-view>
     </div>
+  </div>
 </template>
 <script>
 import Aside from "../components/Aside.vue";

@@ -1,7 +1,6 @@
 <template>
   <div>
     <Table
-      height="1000"
       border
       stripe
       size="large"
@@ -105,9 +104,9 @@ export default {
 
       const searchParams = this.searchParams;
 
-      const pageSQL = `LIMIT ${
-        searchParams.pageSize
-      } OFFSET ${(searchParams.pageIndex - 1) * searchParams.pageSize} `;
+      const pageSQL = `LIMIT ${searchParams.pageSize} OFFSET ${
+        (searchParams.pageIndex - 1) * searchParams.pageSize
+      } `;
 
       const orderSQL = `ORDER BY DateCreated ${searchParams.sort} `;
 

@@ -5,7 +5,7 @@
       style="width: 100%; height: 100px; font-size: 25px; font-weight: 300"
     >
       <Icon type="ios-cloud-upload" size="5px" />
-      Import kobo database file
+      Upload KoboReader.sqlite file
     </Button>
     <input type="file" style="display: none" />
 

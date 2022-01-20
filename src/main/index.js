@@ -50,6 +50,8 @@ function createWindow() {
 }
 
 app.on("ready", () => {
+
+  autoUpdater.checkForUpdatesAndNotify();
   createWindow();
 
   if (fse.existsSync(docDir + "/ecdict.sqlite")) {
@@ -82,4 +84,24 @@ app.on("activate", () => {
   if (mainWindow === null) {
     createWindow();
   }
+});
+
+ipcMain.on("app_version", (event) => {
+  console.log("app_version");
+  event.sender.send("app_version", { version: app.getVersion() });
+});
+
+autoUpdater.on("update-available", (data) => {
+  console.log("update-available");
+  mainWindow.webContents.send("update_available", { data });
+});
+
+autoUpdater.on("update-downloaded", () => {
+  console.log("update-downloaded");
+  mainWindow.webContents.send("update_downloaded");
+});
+
+ipcMain.on("restart_app", () => {
+  console.log("restart_app");
+  autoUpdater.quitAndInstall();
 });

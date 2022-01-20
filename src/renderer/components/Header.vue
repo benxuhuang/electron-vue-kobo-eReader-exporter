@@ -32,9 +32,46 @@ header {
 
 <template>
   <header>
-    <section class="left" style="font-weight: 600;font-family: sans-serif;">
+    <section class="left" style="font-weight: 600; font-family: sans-serif">
       Kobo eReader Exporter
     </section>
+    <Modal
+      v-model="updateModalShow"
+      :mask-closable="false"
+      :closable="false"
+      title="Upgrade"
+    >
+      <div class="aboutText">
+        <Card>
+          <p>New Version: {{ newVersion }}</p>
+          <p>Release Name: {{ releaseName }}</p>
+          <p>Release Notes: {{ releaseNotes }}</p>
+          <p>
+            macOS:
+            <a
+              @click="
+                openUrl(
+                  `https://github.com/benxuhuang/easy-invoices/releases/tag/v${newVersion}`
+                )
+              "
+              >Download update from the web</a
+            >
+          </p>
+          <p style="color: blue">{{ updateText }}</p>
+          <Button
+            type="primary"
+            v-if="showRestartBtn"
+            @click="restartApp"
+            style="margin-top: 5px"
+          >
+            Restart App
+          </Button>
+        </Card>
+      </div>
+      <div slot="footer">
+        <Button @click="closeUpdateModal">Close</Button>
+      </div>
+    </Modal>
   </header>
 </template>
 <script>
@@ -44,88 +81,68 @@ export default {
   data() {
     return {
       currentVersion: packageJson.version,
-      updateText: "",
-      downloadProgress: null,
-      downloadInfo: {
-        percent: null,
-        totalMB: 0,
-        KBPerSecond: 0,
-      },
+      newVersion: "",
+      releaseDate: "",
+      releaseName: "",
+      releaseNotes: "",
       updateModalShow: false,
-      updateInfo: {
-        releaseName: "",
-        releaseNotes: "",
-        releaseDate: "",
-        version: "",
-      },
+      updateText: "",
+      showRestartBtn: false,
     };
   },
   methods: {
-    minWindows() {
-      this.$electron.ipcRenderer.send("min-window");
-    },
-    maxWindows() {
-      this.$electron.ipcRenderer.send("max-window");
-    },
-    closeWindows() {
-      this.$electron.ipcRenderer.send("close-window");
-    },
-    showUpdateModal() {
-      this.updateModalShow = true;
-    },
     updateConfirm() {
-      this.updateModalShow = false;
-      this.$electron.ipcRenderer.send("update-now");
+      this.tryUpdate();
     },
     closeUpdateModal() {
       this.updateModalShow = false;
       this.updateText = "更新已取消";
     },
-    update() {
-      this.$electron.ipcRenderer.on("update-message", (event, msg) => {
-        const message = msg.message;
-        const data = msg.data;
-        switch (message) {
-          case "error":
-            this.updateText = "检查更新失败";
-            this.downloadInfo = this.$options.data().downloadInfo;
-            break;
-          case "update-available":
-            this.updateText = "有可用更新";
-            this.updateInfo = {
-              releaseDate:
-                new Date(data.releaseDate).getTime() -
-                new Date().getTimezoneOffset() * 60 * 1000,
-              releaseName: data.releaseName,
-              releaseNotes: data.releaseNotes,
-              version: data.version,
-            };
-            break;
-          case "update-not-available":
-            this.updateText = "已經是最新版";
-            break;
-          case "download-progress":
-            this.updateText = "";
-            this.downloadInfo = {
-              percent: data.percent.toFixed(2),
-              totalMB: (data.total / 1024 / 1024).toFixed(3),
-              KBPerSecond: (data.bytesPerSecond / 1024).toFixed(3),
-            };
-            break;
-          case "update-downloaded":
-            this.updateText = "";
-            this.downloadInfo = this.$options.data().downloadInfo;
-            this.showUpdateModal();
-            break;
-          default:
-            this.updateText = "";
-            this.downloadInfo = this.$options.data().downloadInfo;
-        }
+    tryUpdate() {
+      console.log("tryUpdate");
+
+      this.$electron.ipcRenderer.on("update_available", (event, msg) => {
+        console.log("update_available");
+        this.updateModalShow = true;
+
+        const releaseDate =
+          new Date(msg.data.releaseDate).getTime() -
+          new Date().getTimezoneOffset() * 60 * 1000;
+
+        this.releaseDate = releaseDate;
+        this.newVersion = msg.data.version;
+        this.releaseName = msg.data.releaseName;
+        this.releaseNotes = msg.data.releaseNotes;
+
+        console.log("newVersion: ", msg.data.version);
+        console.log("releaseDate: ", releaseDate);
+        console.log("releaseName: ", msg.data.releaseName);
+        console.log("releaseNotes: ", msg.data.releaseNotes);
+
+        this.$electron.ipcRenderer.removeAllListeners("update_available");
+        this.updateText = "A new update is available. Downloading now...";
       });
+
+      this.$electron.ipcRenderer.on("update_downloaded", () => {
+        console.log("update_downloaded");
+
+        this.$electron.ipcRenderer.removeAllListeners("update_downloaded");
+        this.updateText =
+          "Update Downloaded. It will be installed on restart. Restart now?";
+
+        this.showRestartBtn = true;
+      });
+    },
+    restartApp() {
+      console.log("restartApp");
+      this.$electron.ipcRenderer.send("restart_app");
+    },
+    openUrl(url) {
+      this.$electron.shell.openExternal(url);
     },
   },
   created() {
-    this.update();
+    this.tryUpdate();
   },
 };
 </script>

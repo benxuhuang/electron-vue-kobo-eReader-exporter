@@ -1,6 +1,6 @@
 {
   "name": "Kobo-eReader-Exporter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "",
   "description": "A GUI application that makes you export data from the Kobo eReader database.",
   "license": "MIT",

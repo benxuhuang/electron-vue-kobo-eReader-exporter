@@ -39,8 +39,6 @@
 4. Upload `KoboReader.sqlite` file
 
 #### Note: Where do I find the KoboReader.sqlite file? 
-#### 如何找到KoboReader.sqlite檔案?
-
 
 `KoboReader.sqlite` is located on your Kobo device.
 Connect your eReader to the computer, and open the folder ".kobo". 

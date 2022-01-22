@@ -44,8 +44,8 @@
 Connect your eReader to the computer, and open the folder ".kobo". 
 There you should find your "KoboReader.sqlite" or "KoboReader" file 
 (you will only see the extension .sqlite if you have that option enabled on your PC). 
-If you can¡¦t find your .kobo folder, that¡¦s because it is hidden on your computer. 
-Don¡¦t worry! 
+If you can't find your .kobo folder, that's because it is hidden on your computer. 
+Don't worry! 
 The following links will explain what you need to do to see the hidden folders and files:
 
 - [Windows explanation](https://www.computerhope.com/issues/ch000516.htm)

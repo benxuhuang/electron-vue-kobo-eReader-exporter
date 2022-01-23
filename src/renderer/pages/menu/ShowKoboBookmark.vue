@@ -104,9 +104,9 @@ export default {
 
       const searchParams = this.searchParams;
 
-      const pageSQL = `LIMIT ${searchParams.pageSize} OFFSET ${
-        (searchParams.pageIndex - 1) * searchParams.pageSize
-      } `;
+      const pageSQL = `LIMIT ${
+        searchParams.pageSize
+      } OFFSET ${(searchParams.pageIndex - 1) * searchParams.pageSize} `;
 
       const orderSQL = `ORDER BY DateCreated ${searchParams.sort} `;
 
@@ -121,7 +121,6 @@ export default {
       this.$logger(rowSQL);
 
       this.$db.all(rowSQL, (err, res) => {
-        console.log(res);
         this.dataList = res;
         const countSQL = "SELECT COUNT(VolumeId) AS totalCount from Bookmark";
         this.$logger(countSQL);

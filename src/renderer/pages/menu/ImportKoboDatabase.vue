@@ -49,13 +49,9 @@ export default {
           let attachDbSql = `ATTACH DATABASE '${filepath[0]}' AS attachdb;`;
 
           this.$db.all(attachDbSql, (err, res) => {
-            console.log(`attachDbSql:${err}`);
-
             let deleteOldDataeSql = `DELETE FROM main.WordList; DELETE FROM main.Bookmark;`;
 
             this.$db.run(deleteOldDataeSql, (err, res) => {
-              console.log(`deleteOldDataeSql:${err}`);
-
               //Copy Bookmark table
               let insertIntoBookmark = `INSERT INTO main.Bookmark SELECT * FROM attachdb.Bookmark;`;
               this.$db.all(insertIntoBookmark, (err, res) => {
@@ -96,9 +92,6 @@ export default {
                       wordListRes[i].Definition = opencc.simplifiedToTaiwan(
                         result[0].translation.join().replace(/,/g, " ")
                       );
-                      console.log(
-                        result[0].translation.join().replace(/,/g, " ")
-                      );
                     } else {
                       wordListRes[i].Definition = "";
                     }
@@ -136,17 +129,7 @@ export default {
         }
       );
     },
-    wordImport() {},
-    searchWord(word) {
-      search(word).then((result) => {
-        if (result[0] != undefined) {
-          return result[0].translation;
-        }
-        return "";
-      });
-    },
   },
-  created() {},
 };
 </script>
 

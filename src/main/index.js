@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import { autoUpdater } from "electron-updater";
 import { docDir } from "../renderer/utils/settings";
 import fse from "fs-extra";
@@ -50,25 +50,21 @@ function createWindow() {
 }
 
 app.on("ready", () => {
-
   autoUpdater.checkForUpdatesAndNotify();
   createWindow();
 
-  if (fse.existsSync(docDir + "/ecdict.sqlite")) {
-    console.log("ecdit-db file exists!");
-  } else {
-    console.log("ecdit-db file does not exists!");
+  if (!fse.existsSync(docDir + "/ecdict.sqlite")) {
+    console.log("ecdit-db file does not exist!");
     let oldDbPath = "./database/ecdict.sqlite";
     if (process.env.NODE_ENV === "production") {
       const dbPath = path.resolve(process.resourcesPath, "database");
-      const dbFile = path.resolve(dbPath, "ecdict.sqlite");
-      oldDbPath = dbFile;
+      oldDbPath = path.resolve(dbPath, "ecdict.sqlite");
     }
 
     fse
       .copy(oldDbPath, docDir + "/ecdict.sqlite")
       .then(() => {
-        console.log("copy ecdit-db file success!");
+        console.log("copy ecdit-db file successfully!");
       })
       .catch((err) => console.error(err));
   }

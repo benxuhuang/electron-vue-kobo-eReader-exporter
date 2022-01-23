@@ -99,10 +99,7 @@ export default {
       this.updateText = "更新已取消";
     },
     tryUpdate() {
-      console.log("tryUpdate");
-
       this.$electron.ipcRenderer.on("update_available", (event, msg) => {
-        console.log("update_available");
         this.updateModalShow = true;
 
         const releaseDate =
@@ -114,27 +111,18 @@ export default {
         this.releaseName = msg.data.releaseName;
         this.releaseNotes = msg.data.releaseNotes;
 
-        console.log("newVersion: ", msg.data.version);
-        console.log("releaseDate: ", releaseDate);
-        console.log("releaseName: ", msg.data.releaseName);
-        console.log("releaseNotes: ", msg.data.releaseNotes);
-
         this.$electron.ipcRenderer.removeAllListeners("update_available");
         this.updateText = "A new update is available. Downloading now...";
       });
 
       this.$electron.ipcRenderer.on("update_downloaded", () => {
-        console.log("update_downloaded");
-
         this.$electron.ipcRenderer.removeAllListeners("update_downloaded");
         this.updateText =
           "Update Downloaded. It will be installed on restart. Restart now?";
-
         this.showRestartBtn = true;
       });
     },
     restartApp() {
-      console.log("restartApp");
       this.$electron.ipcRenderer.send("restart_app");
     },
     openUrl(url) {

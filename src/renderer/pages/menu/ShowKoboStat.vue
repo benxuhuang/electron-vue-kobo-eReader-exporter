@@ -1,7 +1,7 @@
 <template>
-    <Row style="padding:10px">
-      <Card v-for="book in dataList" :key="book.ContentID" :book="book" />
-    </Row>
+  <Row style="padding: 10px">
+    <Card v-for="book in dataList" :key="book.ContentID" :book="book" />
+  </Row>
 </template>
 
 <script>

@@ -48,7 +48,8 @@ export default {
     },
     getBookImage(title, queryAuthor, isbn) {
       const googleApi = "https://www.googleapis.com/books/v1/volumes";
-      const url = `${googleApi}?q=${title}+${queryAuthor}+${isbn}&filter=paid-ebooks&orderBy=newest&maxResults=1`;
+      const queryStr = `intitle:${title}+inauthor:${queryAuthor}`;
+      const url = `${googleApi}?q=${queryStr}&filter=paid-ebooks&orderBy=newest&maxResults=1`;
       axios
         .get(url)
         .then((response) => {

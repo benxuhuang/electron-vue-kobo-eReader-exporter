@@ -49,7 +49,12 @@ export default {
           let attachDbSql = `ATTACH DATABASE '${filepath[0]}' AS attachdb;`;
 
           this.$db.all(attachDbSql, (err, res) => {
-            let deleteOldDataeSql = `DELETE FROM main.WordList; DELETE FROM main.Bookmark;`;
+            let deleteOldDataeSql = `
+              DELETE FROM main.WordList;
+              DELETE FROM main.Bookmark;
+              DELETE FROM main.content;
+              DELETE FROM main.ShelfContent;
+            `;
 
             this.$db.run(deleteOldDataeSql, (err, res) => {
               //Copy Bookmark table

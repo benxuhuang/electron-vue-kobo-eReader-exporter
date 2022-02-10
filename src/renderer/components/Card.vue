@@ -1,7 +1,9 @@
 <template>
-  <Col span="12" offset="2" style="margin-bottom: 15px">
+  <Col span="8" offset="2" style="margin-bottom: 15px">
     <Card>
-      <p slot="title">{{ book.Title }}</p>
+      <p slot="title" class="book-title-link" @click="openUrl(book.ISBN)">
+        {{ book.Title }}
+      </p>
       <p>Percent Read: {{ book.___PercentRead }}% Read</p>
       <p>
         Rest of Book estimate:
@@ -30,9 +32,20 @@ export default {
     millisecondToHours(millisecond) {
       return (millisecond / 60 / 60).toFixed(2);
     },
+    openUrl(isbn) {
+      const url = `https://www.kobo.com/tw/zh/search?query=${isbn}`;
+      this.$electron.shell.openExternal(url);
+    },
   },
 };
 </script>
 
 <style>
+.book-title-link {
+  cursor: pointer;
+}
+
+.book-title-link:hover {
+  color: rgba(40, 123, 211, 0.91);
+}
 </style>

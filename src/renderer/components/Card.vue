@@ -1,24 +1,35 @@
 <template>
-  <Col span="8" offset="2" style="margin-bottom: 15px">
+  <Col span="24" style="margin-bottom: 15px">
     <Card>
-      <a @click="openUrl(book.ISBN)">
-        <img v-bind:src="bookImg" style="max-width: 120px; max-height: 170px" />
-      </a>
       <p slot="title" class="book-title-link" @click="openUrl(book.ISBN)">
         {{ book.Title }}
       </p>
-      <p>Percent Read: {{ book.___PercentRead }}% Read</p>
-      <p>
-        Rest of Book estimate:
-        {{ millisecondToHours(book.RestOfBookEstimate) }} Hours
-      </p>
-      <p>
-        Time spent reading:
-        {{ millisecondToHours(book.TimeSpentReading) }} Hours
-      </p>
-      <p>Last time started reading: {{ book.LastTimeStartedReading }}</p>
-      <p>Last time finished reading: {{ book.LastTimeFinishedReading }}</p>
-      <p></p>
+      <Row>
+        <Col span="8">
+          <a @click="openUrl(book.ISBN)">
+            <img
+              v-bind:src="bookImg"
+              style="max-width: 120px; max-height: 170px"
+            />
+          </a>
+        </Col>
+        <Col span="12">
+          <p>The reading percentage: {{ book.___PercentRead }}% Read</p>
+          <p>
+            The estimate reading time left in the book:
+            {{ millisecondToHours(book.RestOfBookEstimate) }} Hours
+          </p>
+          <p>
+            Time spent reading:
+            {{ millisecondToHours(book.TimeSpentReading) }} Hours
+          </p>
+          <p>Last time of reading: {{ book.LastTimeStartedReading }}</p>
+          <p>
+            Last time of finished reading: {{ book.LastTimeFinishedReading }}
+          </p>
+          <p></p>
+        </Col>
+      </Row>
     </Card>
   </Col>
 </template>

@@ -5,7 +5,7 @@
         {{ book.Title }}
       </p>
       <Row>
-        <Col span="8">
+        <Col span="4">
           <a @click="openUrl(book.ISBN)">
             <img
               v-bind:src="bookImg"
@@ -14,7 +14,11 @@
           </a>
         </Col>
         <Col span="12">
-          <p>The reading percentage: {{ book.___PercentRead }}% Read</p>
+          <p>
+            The reading percentage: {{ book.___PercentRead }}% Read
+            <Icon v-if="book.___PercentRead == 100" type="ios-checkmark"
+            style="color:#9500ff"/>
+          </p>
           <p>
             The estimate reading time left in the book:
             {{ millisecondToHours(book.RestOfBookEstimate) }} Hours

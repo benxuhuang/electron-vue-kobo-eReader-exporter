@@ -19,7 +19,9 @@ export default {
   methods: {
     getDataList() {
       const sql = `
-        SELECT * FROM content WHERE ReadStatus = 1
+        SELECT * FROM content WHERE (ReadStatus = 1 or ReadStatus = 2)
+         and ___SyncTime is not NULL and ___UserID != "removed"
+         order by ___PercentRead DESC,  LastTimeFinishedReading DESC
       `;
       this.$logger(sql);
       this.$db.all(sql, (err, res) => {

@@ -57,6 +57,8 @@ export default {
             `;
 
             this.$db.run(deleteOldDataeSql, (err, res) => {
+              console.log(`deleteOldDataeSql:${err}`);
+
               //Copy Bookmark table
               let insertIntoBookmark = `INSERT INTO main.Bookmark SELECT * FROM attachdb.Bookmark;`;
               this.$db.all(insertIntoBookmark, (err, res) => {

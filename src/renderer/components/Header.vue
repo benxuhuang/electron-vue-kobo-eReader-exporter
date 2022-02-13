@@ -51,7 +51,7 @@ header {
             <a
               @click="
                 openUrl(
-                  `https://github.com/benxuhuang/easy-invoices/releases/tag/v${newVersion}`
+                  `https://github.com/benxuhuang/electron-vue-kobo-eReader-exporter/releases/tag/v${newVersion}`
                 )
               "
               >Download update from the web</a

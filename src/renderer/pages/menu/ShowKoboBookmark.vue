@@ -104,12 +104,11 @@ export default {
 
       const searchParams = this.searchParams;
 
-      const pageSQL = `LIMIT ${
-        searchParams.pageSize
-      } OFFSET ${(searchParams.pageIndex - 1) * searchParams.pageSize} `;
+      const pageSQL = `LIMIT ${searchParams.pageSize} OFFSET ${
+        (searchParams.pageIndex - 1) * searchParams.pageSize
+      } `;
 
       const orderSQL = `ORDER BY DateCreated ${searchParams.sort} `;
-
       const sql = `
           SELECT distinct c.BookTitle, a.Text, date(a.DateCreated) as DateCreated
           from Bookmark a
@@ -117,12 +116,19 @@ export default {
           left outer join content c on c.BookID = a.VolumeID
       `;
 
-      const rowSQL = sql + orderSQL + pageSQL;
+      let rowSQL = sql + orderSQL + pageSQL;
+      let countSQL = "SELECT COUNT(VolumeId) AS totalCount from Bookmark";
+
+      const volumeId = this.$route.params.volumeId;
+      const whereSQL = `where a.VolumeId = '${volumeId}'`;
+      if (volumeId !== ":volumeId") {
+        rowSQL = sql + whereSQL + orderSQL + pageSQL;
+        countSQL = `SELECT COUNT(VolumeId) AS totalCount from Bookmark where VolumeId = '${volumeId}'`;
+      }
       this.$logger(rowSQL);
 
       this.$db.all(rowSQL, (err, res) => {
         this.dataList = res;
-        const countSQL = "SELECT COUNT(VolumeId) AS totalCount from Bookmark";
         this.$logger(countSQL);
         this.$db.get(countSQL, (err, res) => {
           if (err) {

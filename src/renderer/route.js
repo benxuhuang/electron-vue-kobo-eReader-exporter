@@ -9,7 +9,7 @@ for (const menu of menus) {
 
 childrenRoutes.push({
   path: '*',
-  redirect: menus[ 0 ].path,
+  redirect: menus[0].path,
 });
 
 const routes = [

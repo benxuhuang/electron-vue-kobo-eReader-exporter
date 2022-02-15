@@ -28,7 +28,9 @@
         </Button>
       </FormItem>
     </Form>
-    <Alert show-icon style="font-size: 15px;">The pronunciation feature requires network support.</Alert>
+    <Alert show-icon style="font-size: 15px"
+      >The pronunciation feature requires network support.</Alert
+    >
   </div>
 </template>
 
@@ -115,20 +117,30 @@ export default {
       if (typeof method === "number") {
         this.searchParams.pageIndex = method;
       }
+
       const searchParams = this.searchParams;
-      const pageSQL = `LIMIT ${
-        searchParams.pageSize
-      } OFFSET ${(searchParams.pageIndex - 1) * searchParams.pageSize} `;
+
+      const pageSQL = `LIMIT ${searchParams.pageSize} OFFSET ${
+        (searchParams.pageIndex - 1) * searchParams.pageSize
+      } `;
+
       const orderSQL = `ORDER BY DateCreated ${searchParams.sort} `;
-      const rowSQL =
-        "SELECT Text, Definition, date(DateCreated) as DateCreated from WordList " +
-        orderSQL +
-        pageSQL;
+
+      const sql = `SELECT Text, Definition, date(DateCreated) as DateCreated from WordList `;
+
+      let rowSQL = sql + orderSQL + pageSQL;
+      let countSQL = "SELECT COUNT(VolumeId) AS totalCount from WordList";
+
+      const volumeId = this.$route.params.volumeId;
+      const whereSQL = `where VolumeId = '${volumeId}'`;
+      if (volumeId !== ":volumeId") {
+        rowSQL = sql + whereSQL + orderSQL + pageSQL;
+        countSQL = `SELECT COUNT(VolumeId) AS totalCount from WordList where VolumeId = '${volumeId}'`;
+      }
       this.$logger(rowSQL);
 
       this.$db.all(rowSQL, (err, res) => {
         this.dataList = res;
-        const countSQL = "SELECT COUNT(VolumeId) AS totalCount from WordList";
         this.$logger(countSQL);
         this.$db.get(countSQL, (err, res) => {
           if (err) {

@@ -36,8 +36,22 @@
           </p>
           <br />
           <Row>
-            <Button icon="bookmark" type="default">BookMark</Button>
-            <Button icon="document" type="default">WordList</Button>
+            <router-link
+              :to="{
+                name: 'ShowKoboBookmark',
+                params: { volumeId: book.ContentID },
+              }"
+            >
+              <Button icon="bookmark" type="default">Bookmarks</Button>
+            </router-link>
+            <router-link
+              :to="{
+                name: 'ShowKoboWordList',
+                params: { volumeId: book.ContentID },
+              }"
+            >
+              <Button icon="document" type="default">WordList</Button>
+            </router-link>
           </Row>
         </Col>
       </Row>

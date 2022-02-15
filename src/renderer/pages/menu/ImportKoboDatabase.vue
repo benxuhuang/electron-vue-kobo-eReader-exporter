@@ -40,101 +40,118 @@ export default {
           ],
           properties: ["openFile", "showHiddenFiles"],
         },
-        (filepath) => {
+        async (filepath) => {
           this.dataLoading = true;
           if (filepath == undefined) {
             this.dataLoading = false;
           }
 
-          let attachDbSql = `ATTACH DATABASE '${filepath[0]}' AS attachdb;`;
+          try {
+            //attach db
+            await this.sqlCommand(
+              `ATTACH DATABASE '${filepath[0]}' AS attachdb;`,
+              []
+            );
+            console.log("Successful attach database");
 
-          this.$db.all(attachDbSql, (err, res) => {
-            let deleteOldDataeSql = `
-              DELETE FROM main.WordList;
-              DELETE FROM main.Bookmark;
-              DELETE FROM main.content;
-              DELETE FROM main.ShelfContent;
-            `;
+            //delete Bookmark table
+            await this.sqlCommand(`DELETE FROM main.Bookmark;`, []);
+            console.log("Successful delete Bookmark table");
 
-            this.$db.run(deleteOldDataeSql, (err, res) => {
-              console.log(`deleteOldDataeSql:${err}`);
+            //copy Bookmark table
+            await this.sqlCommand(
+              `INSERT INTO main.Bookmark SELECT * FROM attachdb.Bookmark;`,
+              []
+            );
+            console.log("Successful copy Bookmark table");
 
-              //Copy Bookmark table
-              let insertIntoBookmark = `INSERT INTO main.Bookmark SELECT * FROM attachdb.Bookmark;`;
-              this.$db.all(insertIntoBookmark, (err, res) => {
-                console.log(`insertIntoBookmark:${err}`);
-              });
+            //delete content table
+            await this.sqlCommand(`DELETE FROM main.content;`, []);
+            console.log("Successful delete content table");
 
-              //Copy ShelfContent table
-              let insertIntoShelfContent = `INSERT INTO main.ShelfContent SELECT * FROM attachdb.ShelfContent;`;
-              this.$db.all(insertIntoShelfContent, (err, res) => {
-                console.log(`insertIntoShelfContent:${err}`);
-              });
+            //copy content table
+            await this.sqlCommand(
+              `INSERT INTO main.content SELECT * FROM attachdb.content;`,
+              []
+            );
+            console.log("Successful copy content table");
 
-              //Copy content table
-              let insertIntoContent = `INSERT INTO main.content SELECT * FROM attachdb.content;`;
-              this.$db.all(insertIntoContent, (err, res) => {
-                console.log(`insertIntoContent:${err}`);
-              });
+            //delete ShelfContent table
+            await this.sqlCommand(`DELETE FROM main.ShelfContent;`, []);
+            console.log("Successful delete ShelfContent table");
 
-              //Copy WordList table
-              let getNewWordListDataSql = `SELECT * FROM attachdb.WordList;`;
+            //copy ShelfContent table
+            await this.sqlCommand(
+              `INSERT INTO main.ShelfContent SELECT * FROM attachdb.ShelfContent;`,
+              []
+            );
+            console.log("Successful copy ShelfContent table");
 
-              this.$db.all(getNewWordListDataSql, (err, wordListRes) => {
-                console.log(`getNewWordListDataSql:${err}`);
+            //delete WordList table
+            await this.sqlCommand(`DELETE FROM main.WordList;`, []);
+            console.log("Successful delete WordList table");
 
-                if (wordListRes.length == 0) {
-                  this.dataLoading = false;
-                  this.$Notice.success({
-                    title: "Success",
-                    desc: "Data has been successfully uploaded!",
-                  });
-                }
+            //get wordlist
+            let result = await this.sqlCommand(
+              `SELECT * FROM attachdb.WordList;`,
+              []
+            );
+            console.log("Successful get wordlist table");
+            await this.getWordDefinition(result);
+            console.log(result);
 
-                console.log(wordListRes);
+            // insert wordlist table
+            for (let i = 0; i < result.length; i++) {
+              const insertSql = `INSERT INTO main.WordList (Text, DateCreated, Definition, VolumeId)
+                                  VALUES ('${result[i].Text}', '${result[i].DateCreated}', '${result[i].Definition}',
+                                  '${result[i].VolumeId}')`;
+              await this.sqlCommand(insertSql, []);
+            }
+            console.log("Successful insert wordlist");
 
-                for (let i = 0; i < wordListRes.length; i++) {
-                  search(wordListRes[i].Text).then((result) => {
-                    if (result[0] != undefined) {
-                      wordListRes[i].Definition = opencc.simplifiedToTaiwan(
-                        result[0].translation.join().replace(/,/g, " ")
-                      );
-                    } else {
-                      wordListRes[i].Definition = "";
-                    }
+            //detach database
+            await this.sqlCommand(`DETACH DATABASE 'attachdb';`, []);
 
-                    this.$db.run(
-                      "INSERT INTO main.WordList (Text, DateCreated, Definition, VolumeId) VALUES (?, ?, ?, ?)",
-                      [
-                        wordListRes[i].Text,
-                        wordListRes[i].DateCreated,
-                        wordListRes[i].Definition,
-                        wordListRes[i].VolumeId,
-                      ]
-                    ),
-                      (err) => {
-                        console.log(`INSERT INTO:${err}`);
-                      };
-
-                    if (i == wordListRes.length - 1) {
-                      this.dataLoading = false;
-                      this.$Notice.success({
-                        title: "Success",
-                        desc: "Data has been successfully uploaded!",
-                      });
-                    }
-                  });
-                }
-
-                //detach db
-                this.$db.all(`DETACH DATABASE 'attachdb';`, (err) => {
-                  console.log(`DETACH DATABASE`);
-                });
-              });
+            this.dataLoading = false;
+            this.$Notice.success({
+              title: "Success",
+              desc: "Data has been successfully uploaded!",
             });
-          });
+          } catch (err) {
+            return console.error(err.message);
+          }
         }
       );
+    },
+    sqlCommand(sql, params) {
+      return new Promise((resolve, reject) => {
+        this.$db.all(sql, params, function (err, rows) {
+          if (err) {
+            reject(err);
+          }
+          resolve(rows);
+        });
+      });
+    },
+    getWordDefinition(wordList) {
+      return new Promise((resolve, reject) => {
+        try {
+          for (let i = 0; i < wordList.length; i++) {
+            search(wordList[i].Text).then((res) => {
+              if (res[0] != undefined) {
+                wordList[i].Definition = opencc.simplifiedToTaiwan(
+                  res[0].translation.join().replace(/,/g, " ")
+                );
+              } else {
+                wordList[i].Definition = "";
+              }
+            });
+          }
+          resolve(wordList);
+        } catch (err) {
+          reject(err);
+        }
+      });
     },
   },
 };

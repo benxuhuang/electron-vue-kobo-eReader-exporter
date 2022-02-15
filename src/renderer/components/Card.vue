@@ -16,8 +16,11 @@
         <Col span="12">
           <p>
             The reading percentage: {{ book.___PercentRead }}% Read
-            <Icon v-if="book.___PercentRead == 100" type="ios-checkmark"
-            style="color:#9500ff"/>
+            <Icon
+              v-if="book.___PercentRead == 100"
+              type="ios-checkmark"
+              style="color: #9500ff"
+            />
           </p>
           <p>
             The estimate reading time left in the book:
@@ -31,7 +34,11 @@
           <p>
             Last time of finished reading: {{ book.LastTimeFinishedReading }}
           </p>
-          <p></p>
+          <br />
+          <Row>
+            <Button icon="bookmark" type="default">BookMark</Button>
+            <Button icon="document" type="default">WordList</Button>
+          </Row>
         </Col>
       </Row>
     </Card>

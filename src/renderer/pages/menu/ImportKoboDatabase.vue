@@ -117,6 +117,8 @@ export default {
               title: "Success",
               desc: "Data has been successfully uploaded!",
             });
+
+            this.$router.push({ path: "/ShowKoboStat" });
           } catch (err) {
             return console.error(err.message);
           }

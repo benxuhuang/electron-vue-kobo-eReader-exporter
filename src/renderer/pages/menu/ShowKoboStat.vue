@@ -19,7 +19,11 @@ export default {
   methods: {
     getDataList() {
       const sql = `
-        SELECT * FROM content WHERE (ReadStatus = 1 or ReadStatus = 2)
+        SELECT ISBN, Title, ContentID, ___PercentRead, RestOfBookEstimate,
+        TimeSpentReading, Attribution, 
+	      date(LastTimeStartedReading) as LastTimeStartedReading,
+        date(LastTimeFinishedReading) as LastTimeFinishedReading
+	      FROM content WHERE (ReadStatus = 1 or ReadStatus = 2)
          and ___SyncTime is not NULL and ___UserID != "removed"
          order by ___PercentRead DESC,  LastTimeFinishedReading DESC
       `;

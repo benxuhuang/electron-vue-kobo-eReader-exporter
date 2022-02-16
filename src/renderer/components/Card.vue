@@ -15,7 +15,7 @@
         </Col>
         <Col span="12">
           <p>
-            The reading percentage: {{ book.___PercentRead }}% Read
+            Reading percentage: {{ book.___PercentRead }}% Read
             <Icon
               v-if="book.___PercentRead == 100"
               type="ios-checkmark"
@@ -23,7 +23,7 @@
             />
           </p>
           <p>
-            The estimate reading time left in the book:
+            Reading time remaining:
             {{ millisecondToHours(book.RestOfBookEstimate) }} Hours
           </p>
           <p>
